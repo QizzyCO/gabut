@@ -9,13 +9,18 @@ index 6663996e5ccc5b6120106c1951f5a9a0e28c7014..c5d632d38a9cb3d7c76c45008f1d3c92
  import "slick-carousel/slick/slick-theme.css"
 -import ButtonSend from "../components/ButtonSend"
 -import ButtonRequest from "../components/ButtonRequest"
- import { getStorage, ref, listAll, getDownloadURL } from "firebase/storage"
+
  import Modal from "@mui/material/Modal"
  import { Box, IconButton } from "@mui/material"
  import CloseIcon from "@mui/icons-material/Close"
  import { useSpring, animated } from "@react-spring/web" // Import the necessary components
 +import { demoGalleryImages } from "../data/demoContent"
- 
+ const [images] = useState([
+  "https://imgs.search.brave.com/FHr6MmLJbHF2I3VQqYAKpAbeJIXBkDRAP71dSiJSwxM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMucGV4ZWxzLmNv/bS9waG90b3MvMTY1/MDAzNy9wZXhlbHMt/cGhvdG8tMTY1MDAz/Ny5qcGVnP2F1dG89/Y29tcHJlc3MmY3M9/dGlueXNyZ2ImZHBy/PTEmdz01MDA",
+  "https://drive.google.com/uc?export=view&id=FILE_ID_2",
+  "https://drive.google.com/uc?export=view&id=FILE_ID_3",
+])
+
  const Carousel = () => {
  	const [images, setImages] = useState([])
  	const [open, setOpen] = useState(false)
