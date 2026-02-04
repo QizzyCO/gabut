@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography"
 import { useSpring, animated } from "@react-spring/web"
 import CloseIcon from "@mui/icons-material/Close"
 import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "firebase/storage"
+import { demoRequestImages } from "../data/demoContent"
 
 export default function ButtonRequest() {
 	const [open, setOpen] = useState(false)
@@ -20,6 +21,7 @@ export default function ButtonRequest() {
 	})
 
 	const [images, setImages] = useState([])
+	const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true)
 
 	// Fungsi untuk mengambil daftar gambar dari Firebase Storage
 	const fetchImagesFromFirebase = async () => {
@@ -44,9 +46,17 @@ export default function ButtonRequest() {
 			// Urutkan array berdasarkan timestamp (dari yang terlama)
 			imageURLs.sort((a, b) => a.timestamp - b.timestamp)
 
+			if (imageURLs.length === 0) {
+				setIsFirebaseAvailable(false)
+				setImages(demoRequestImages)
+				return
+			}
+
 			setImages(imageURLs)
 		} catch (error) {
 			console.error("Error fetching images from Firebase Storage:", error)
+			setIsFirebaseAvailable(false)
+			setImages(demoRequestImages)
 		}
 	}
 
@@ -82,6 +92,11 @@ export default function ButtonRequest() {
 						/>
 						<Typography id="spring-modal-description" sx={{ mt: 2 }}>
 							<h6 className="text-center text-white text-2xl mb-5">Request</h6>
+							{!isFirebaseAvailable && (
+								<p className="text-center text-xs text-white/70 mb-3">
+									Mode demo aktif. Hubungkan Firebase untuk melihat request asli.
+								</p>
+							)}
 							<div className="h-[22rem] overflow-y-scroll overflow-y-scroll-no-thumb">
 								{images
 									.map((imageData, index) => (

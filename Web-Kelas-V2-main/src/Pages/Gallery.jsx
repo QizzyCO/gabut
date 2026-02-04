@@ -9,11 +9,13 @@ import Modal from "@mui/material/Modal"
 import { Box, IconButton } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import { useSpring, animated } from "@react-spring/web" // Import the necessary components
+import { demoGalleryImages } from "../data/demoContent"
 
 const Carousel = () => {
 	const [images, setImages] = useState([])
 	const [open, setOpen] = useState(false)
 	const [selectedImage, setSelectedImage] = useState(null)
+	const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true)
 
 	const modalFade = useSpring({
 		opacity: open ? 1 : 0,
@@ -35,9 +37,17 @@ const Carousel = () => {
 				}),
 			)
 
+			if (imageURLs.length === 0) {
+				setIsFirebaseAvailable(false)
+				setImages(demoGalleryImages)
+				return
+			}
+
 			setImages(imageURLs)
 		} catch (error) {
 			console.error("Error fetching images from Firebase Storage:", error)
+			setIsFirebaseAvailable(false)
+			setImages(demoGalleryImages)
 		}
 	}
 
@@ -92,6 +102,11 @@ const Carousel = () => {
 			<div className="text-white opacity-60 text-base font-semibold mb-4 mx-[10%] mt-10 lg:text-center lg:text-3xl lg:mb-8" id="Gallery">
 				Class Gallery
 			</div>
+			{!isFirebaseAvailable && (
+				<div className="text-center text-sm text-white/70 mb-4">
+					Gallery sedang memakai mode demo. Hubungkan Firebase untuk melihat foto terbaru.
+				</div>
+			)}
 			<div id="Carousel">
 				<Slider {...settings}>
 					{images.map((imageUrl, index) => (
