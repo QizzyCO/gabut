@@ -123,10 +123,7 @@ index 6663996e5ccc5b6120106c1951f5a9a0e28c7014..c5d632d38a9cb3d7c76c45008f1d3c92
  				</Slider>
  			</div>
  
--			<div className="flex justify-center items-center gap-6 text-base mt-5 lg:mt-8">
--				<ButtonSend />
--				<ButtonRequest />
--			</div>
+-		
 -
  			<Modal
  				open={open}
