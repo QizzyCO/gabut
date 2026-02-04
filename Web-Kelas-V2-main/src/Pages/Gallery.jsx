@@ -1,70 +1,28 @@
-diff --git a/Web-Kelas-V2-main/src/Pages/Gallery.jsx b/Web-Kelas-V2-main/src/Pages/Gallery.jsx
-index 6663996e5ccc5b6120106c1951f5a9a0e28c7014..c5d632d38a9cb3d7c76c45008f1d3c926766263d 100644
---- a/Web-Kelas-V2-main/src/Pages/Gallery.jsx
-+++ b/Web-Kelas-V2-main/src/Pages/Gallery.jsx
-@@ -1,65 +1,73 @@
- import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
  import Slider from "react-slick"
  import "slick-carousel/slick/slick.css"
  import "slick-carousel/slick/slick-theme.css"
--import ButtonSend from "../components/ButtonSend"
--import ButtonRequest from "../components/ButtonRequest"
+
+
 
  import Modal from "@mui/material/Modal"
  import { Box, IconButton } from "@mui/material"
  import CloseIcon from "@mui/icons-material/Close"
  import { useSpring, animated } from "@react-spring/web" // Import the necessary components
-+import { demoGalleryImages } from "../data/demoContent"
- const [images] = useState([
-  "https://imgs.search.brave.com/FHr6MmLJbHF2I3VQqYAKpAbeJIXBkDRAP71dSiJSwxM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMucGV4ZWxzLmNv/bS9waG90b3MvMTY1/MDAzNy9wZXhlbHMt/cGhvdG8tMTY1MDAz/Ny5qcGVnP2F1dG89/Y29tcHJlc3MmY3M9/dGlueXNyZ2ImZHBy/PTEmdz01MDA",
-  "https://drive.google.com/uc?export=view&id=FILE_ID_2",
-  "https://drive.google.com/uc?export=view&id=FILE_ID_3",
-])
-
+import { galleryImageUrls } from "../data/galleryUrls"
+ 
  const Carousel = () => {
- 	const [images, setImages] = useState([])
+
++	const [images] = useState(galleryImageUrls)
  	const [open, setOpen] = useState(false)
  	const [selectedImage, setSelectedImage] = useState(null)
-+	const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true)
  
  	const modalFade = useSpring({
  		opacity: open ? 1 : 0,
  		config: { duration: 300 }, // Adjust the duration as needed
  	})
  
- 	// Fungsi untuk mengambil daftar gambar dari Firebase Storage
- 	const fetchImagesFromFirebase = async () => {
- 		try {
- 			const storage = getStorage() // Mendapatkan referensi Firebase Storage
- 			const storageRef = ref(storage, "GambarAman/") // Menggunakan ref dengan storage
- 
- 			const imagesList = await listAll(storageRef) // Menggunakan listAll untuk mendapatkan daftar gambar
- 
- 			const imageURLs = await Promise.all(
- 				imagesList.items.map(async (item) => {
- 					const url = await getDownloadURL(item) // Menggunakan getDownloadURL untuk mendapatkan URL gambar
- 					return url
- 				}),
- 			)
- 
-+			if (imageURLs.length === 0) {
-+				setIsFirebaseAvailable(false)
-+				setImages(demoGalleryImages)
-+				return
-+			}
-+
- 			setImages(imageURLs)
- 		} catch (error) {
- 			console.error("Error fetching images from Firebase Storage:", error)
-+			setIsFirebaseAvailable(false)
-+			setImages(demoGalleryImages)
- 		}
- 	}
- 
- 	useEffect(() => {
- 		fetchImagesFromFirebase()
- 	}, [])
- 
+
  	const settings = {
  		centerMode: true,
  		centerPadding: "30px",
@@ -83,21 +41,14 @@ index 6663996e5ccc5b6120106c1951f5a9a0e28c7014..c5d632d38a9cb3d7c76c45008f1d3c92
  					slidesToShow: 1,
  					dots: false,
  				},
-@@ -70,69 +78,69 @@ const Carousel = () => {
+ 			},
+ 			{
+ 				breakpoint: 480,
+ 				settings: {
  					arrows: false,
  					centerMode: true,
  					centerPadding: "70px",
- 					slidesToShow: 1,
- 					dots: false,
- 				},
- 			},
- 		],
- 	}
- 
- 	const handleImageClick = (imageUrl) => {
- 		setSelectedImage(imageUrl)
- 		setOpen(true)
- 	}
+@@ -84,55 +57,50 @@ const Carousel = () => {
  
  	const handleCloseModal = () => {
  		setOpen(false)
@@ -109,11 +60,6 @@ index 6663996e5ccc5b6120106c1951f5a9a0e28c7014..c5d632d38a9cb3d7c76c45008f1d3c92
  			<div className="text-white opacity-60 text-base font-semibold mb-4 mx-[10%] mt-10 lg:text-center lg:text-3xl lg:mb-8" id="Gallery">
  				Class Gallery
  			</div>
-+			{!isFirebaseAvailable && (
-+				<div className="text-center text-sm text-white/70 mb-4">
-+					Gallery sedang memakai mode demo. Hubungkan Firebase untuk melihat foto terbaru.
-+				</div>
-+			)}
  			<div id="Carousel">
  				<Slider {...settings}>
  					{images.map((imageUrl, index) => (
@@ -128,8 +74,6 @@ index 6663996e5ccc5b6120106c1951f5a9a0e28c7014..c5d632d38a9cb3d7c76c45008f1d3c92
  				</Slider>
  			</div>
  
--		
--
  			<Modal
  				open={open}
  				onClose={handleCloseModal}
