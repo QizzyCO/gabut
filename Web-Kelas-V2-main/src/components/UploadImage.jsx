@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
  function UploadImage() {
    const [imageUpload, setImageUpload] = useState(null);
    const [imageList, setImageList] = useState([]);
-  const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true);
++  const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true);
    const maxUploadSizeInBytes = 10 * 1024 * 1024; // 10MB
    const maxUploadsPerDay = 20;
    
@@ -26,27 +26,27 @@ import React, { useState, useEffect } from "react";
            })
            .catch((error) => {
              console.log(error);
-            setIsFirebaseAvailable(false);
++            setIsFirebaseAvailable(false);
            });
        })
        .catch((error) => {
          console.log(error);
-        setIsFirebaseAvailable(false);
++        setIsFirebaseAvailable(false);
        });
    };
  
    const uploadImage = () => {
-    if (!isFirebaseAvailable) {
-      Swal.fire({
-        icon: "info",
-        title: "Upload nonaktif",
-        text: "Hubungkan Firebase agar fitur upload dapat digunakan.",
-        customClass: {
-          container: "sweet-alert-container",
-        },
-      });
-      return;
-    }
++    if (!isFirebaseAvailable) {
++      Swal.fire({
++        icon: "info",
++        title: "Upload nonaktif",
++        text: "Hubungkan Firebase agar fitur upload dapat digunakan.",
++        customClass: {
++          container: "sweet-alert-container",
++        },
++      });
++      return;
++    }
      if (imageUpload == null) return;
  
      const uploadedImagesCount = parseInt(localStorage.getItem("uploadedImagesCount")) || 0;
@@ -98,13 +98,13 @@ import React, { useState, useEffect } from "react";
            })
            .catch((error) => {
              console.log(error);
-            setIsFirebaseAvailable(false);
++            setIsFirebaseAvailable(false);
            });
          setImageUpload(null);
        })
        .catch((error) => {
          console.log(error);
-        setIsFirebaseAvailable(false);
++        setIsFirebaseAvailable(false);
        });
    };
  
@@ -156,13 +156,16 @@ import React, { useState, useEffect } from "react";
  				onClick={uploadImage}>
  				UPLOAD
  			</button>
-			{!isFirebaseAvailable && (
-				<p className="mt-3 text-xs text-white/70 text-center">
-					Mode demo aktif. Upload akan tersedia setelah Firebase dikonfigurasi.
-				</p>
-			)}
++			{!isFirebaseAvailable && (
++				<p className="mt-3 text-xs text-white/70 text-center">
++					Mode demo aktif. Upload akan tersedia setelah Firebase dikonfigurasi.
++				</p>
++			)}
  		</div>
  	)
  }
  
  export default UploadImage
+ 
+EOF
+)
