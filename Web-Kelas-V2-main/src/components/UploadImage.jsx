@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 function UploadImage() {
   const [imageUpload, setImageUpload] = useState(null);
   const [imageList, setImageList] = useState([]);
+  const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true);
   const maxUploadSizeInBytes = 10 * 1024 * 1024; // 10MB
   const maxUploadsPerDay = 20;
   
@@ -25,14 +26,27 @@ function UploadImage() {
           })
           .catch((error) => {
             console.log(error);
+            setIsFirebaseAvailable(false);
           });
       })
       .catch((error) => {
         console.log(error);
+        setIsFirebaseAvailable(false);
       });
   };
 
   const uploadImage = () => {
+    if (!isFirebaseAvailable) {
+      Swal.fire({
+        icon: "info",
+        title: "Upload nonaktif",
+        text: "Hubungkan Firebase agar fitur upload dapat digunakan.",
+        customClass: {
+          container: "sweet-alert-container",
+        },
+      });
+      return;
+    }
     if (imageUpload == null) return;
 
     const uploadedImagesCount = parseInt(localStorage.getItem("uploadedImagesCount")) || 0;
@@ -87,11 +101,13 @@ function UploadImage() {
           })
           .catch((error) => {
             console.log(error);
+            setIsFirebaseAvailable(false);
           });
         setImageUpload(null);
       })
       .catch((error) => {
         console.log(error);
+        setIsFirebaseAvailable(false);
       });
   };
 
@@ -151,6 +167,11 @@ function UploadImage() {
 				onClick={uploadImage}>
 				UPLOAD
 			</button>
+			{!isFirebaseAvailable && (
+				<p className="mt-3 text-xs text-white/70 text-center">
+					Mode demo aktif. Upload akan tersedia setelah Firebase dikonfigurasi.
+				</p>
+			)}
 		</div>
 	)
 }

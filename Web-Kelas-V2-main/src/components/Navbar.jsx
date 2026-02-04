@@ -14,8 +14,8 @@ const Navbar = () => {
 				<div className="w-10 h-10 rounded-full flex justify-center items-center" id="UserButton">
 					<img src="/NavIcon.png" alt="" className="w-6 h-6" onClick={toggleMenu} />
 				</div>
-				<div className={`text-center text-white ${isMenuOpen ? "hidden" : ""}`}>
-					<div className="text-[0.7rem]">Hi, visitor!</div>
+					<div className={`text-center text-white ${isMenuOpen ? "hidden" : ""}`}>
+						<div className="text-[0.7rem]">Hai teman!</div>
 					<div className="font-bold text-[1rem]">WELCOME</div>
 				</div>
 

@@ -3,6 +3,7 @@ import { addDoc, collection, query, orderBy, onSnapshot, getDocs } from "firebas
 import { db, auth } from "../firebase";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { demoChatMessages } from "../data/demoContent";
 
 function Chat() {
   const [message, setMessage] = useState("");
@@ -10,9 +11,11 @@ function Chat() {
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true);
   const [userIp, setUserIp] = useState("");
   const [messageCount, setMessageCount] = useState(0);
+  const [isFirebaseAvailable, setIsFirebaseAvailable] = useState(true);
 
   const chatsCollectionRef = collection(db, "chats");
   const messagesEndRef = useRef(null);
+  const localChatKey = "localChatMessages";
 
   // Fungsi untuk mengambil daftar alamat IP yang diblokir dari Firebase Firestore
   const fetchBlockedIPs = async () => {
@@ -22,26 +25,44 @@ function Chat() {
       return blockedIPs;
     } catch (error) {
       console.error("Gagal mengambil daftar IP yang diblokir:", error);
+      setIsFirebaseAvailable(false);
       return [];
     }
   }
 
+  const loadLocalMessages = () => {
+    const storedMessages = JSON.parse(localStorage.getItem(localChatKey) || "[]");
+    if (storedMessages.length > 0) {
+      setMessages(storedMessages);
+    } else {
+      setMessages(demoChatMessages);
+    }
+  };
+
   useEffect(() => {
     // Memuat pesan dari Firestore dan mengatur langganan untuk memantau perubahan
     const queryChats = query(chatsCollectionRef, orderBy("timestamp"));
-    const unsubscribe = onSnapshot(queryChats, (snapshot) => {
-      const newMessages = snapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          ...data,
-          userIp: data.userIp,
-        };
-      });
-      setMessages(newMessages);
-      if (shouldScrollToBottom) {
-        scrollToBottom();
-      }
-    });
+    const unsubscribe = onSnapshot(
+      queryChats,
+      (snapshot) => {
+        const newMessages = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            ...data,
+            userIp: data.userIp,
+          };
+        });
+        setMessages(newMessages);
+        if (shouldScrollToBottom) {
+          scrollToBottom();
+        }
+      },
+      (error) => {
+        console.error("Gagal memuat pesan dari Firebase:", error);
+        setIsFirebaseAvailable(false);
+        loadLocalMessages();
+      },
+    );
 
     return () => {
       unsubscribe(); // Membersihkan langganan saat komponen tidak lagi digunakan
@@ -51,9 +72,14 @@ function Chat() {
   useEffect(() => {
     // Mengambil alamat IP pengguna dan memeriksa batasan pesan
     getUserIp();
-    checkMessageCount();
     scrollToBottom();
   }, []);
+
+  useEffect(() => {
+    if (userIp) {
+      checkMessageCount();
+    }
+  }, [userIp]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -79,11 +105,14 @@ function Chat() {
       localStorage.setItem("ipExpiration", expirationTime.toString());
     } catch (error) {
       console.error("Gagal mendapatkan alamat IP:", error);
+      const fallbackIp = "local-preview";
+      setUserIp(fallbackIp);
+      localStorage.setItem("userIp", fallbackIp);
     }
   };
 
   const checkMessageCount = () => {
-    const userIpAddress = userIp;
+    const userIpAddress = userIp || "local-preview";
     const currentDate = new Date();
     const currentDateString = currentDate.toDateString();
     const storedDateString = localStorage.getItem("messageCountDate");
@@ -112,12 +141,41 @@ function Chat() {
 
   // Fungsi untuk memeriksa apakah alamat IP pengguna ada dalam daftar hitam
   const isIpBlocked = async () => {
+    if (!isFirebaseAvailable) {
+      return false;
+    }
     const blockedIPs = await fetchBlockedIPs();
     return blockedIPs.includes(userIp);
   };
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
+      if (!isFirebaseAvailable) {
+        const senderImageURL = "/AnonimUser.png";
+        const trimmedMessage = message.trim().substring(0, 60);
+        const userIpAddress = userIp || "local-preview";
+
+        const updatedSentMessageCount = messageCount + 1;
+        localStorage.setItem(userIpAddress, updatedSentMessageCount.toString());
+        setMessageCount(updatedSentMessageCount);
+
+        const nextMessages = [
+          ...messages,
+          {
+            message: trimmedMessage,
+            sender: { image: senderImageURL },
+            timestamp: new Date().toISOString(),
+            userIp: userIpAddress,
+          },
+        ];
+        setMessages(nextMessages);
+        localStorage.setItem(localChatKey, JSON.stringify(nextMessages));
+        setMessage("");
+        setTimeout(() => {
+          setShouldScrollToBottom(true);
+        }, 100);
+        return;
+      }
       // Memanggil isIpBlocked untuk memeriksa apakah pengguna diblokir
       const isBlocked = await isIpBlocked();
 
@@ -154,14 +212,20 @@ function Chat() {
       setMessageCount(updatedSentMessageCount);
 
       // Menambahkan pesan ke Firestore
-      await addDoc(chatsCollectionRef, {
-        message: trimmedMessage,
-        sender: {
-          image: senderImageURL,
-        },
-        timestamp: new Date(),
-        userIp: userIp,
-      });
+      try {
+        await addDoc(chatsCollectionRef, {
+          message: trimmedMessage,
+          sender: {
+            image: senderImageURL,
+          },
+          timestamp: new Date(),
+          userIp: userIp,
+        });
+      } catch (error) {
+        console.error("Gagal mengirim pesan ke Firebase:", error);
+        setIsFirebaseAvailable(false);
+        loadLocalMessages();
+      }
 
       setMessage(""); // Menghapus pesan setelah mengirim
       setTimeout(() => {
@@ -182,6 +246,11 @@ function Chat() {
       <div className="text-center text-4xl font-semibold" id="Glow">
         Text Anonim
       </div>
+      {!isFirebaseAvailable && (
+        <p className="text-center text-xs text-white/70 mt-2">
+          Mode demo aktif. Pesan tersimpan lokal di perangkat ini.
+        </p>
+      )}
 
       <div className="mt-5" id="KotakPesan" style={{ overflowY: "auto" }}>
         {messages.map((msg, index) => (
