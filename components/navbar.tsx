@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
+/* eslint-disable @next/next/no-img-element */
 import { Menu, User, X } from "lucide-react"
 
 export function Navbar() {
@@ -71,8 +71,8 @@ export function Navbar() {
       {/* Desktop */}
       <div className="hidden lg:flex justify-between relative top-3">
         <div>
-          <Image
-            src="/LogoPHI.png"
+          <img
+            src="https://picsum.photos/seed/logo/48/48"
             width={48}
             height={48}
             alt="Logo PHI"

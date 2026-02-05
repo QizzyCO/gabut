@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Send, User } from "lucide-react"
-import Image from "next/image"
+
 
 type Message = {
   id: string

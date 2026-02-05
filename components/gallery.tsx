@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
+/* eslint-disable @next/next/no-img-element */
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
 
 const galleryImageUrls = [
-  "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg",
-  "https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg",
-  "https://images.pexels.com/photos/3584994/pexels-photo-3584994.jpeg",
-  "https://images.pexels.com/photos/3775857/pexels-photo-3775857.jpeg",
-  "https://images.pexels.com/photos/1181472/pexels-photo-1181472.jpeg",
-  "https://images.pexels.com/photos/3808014/pexels-photo-3808014.jpeg",
+  "https://picsum.photos/seed/class1/400/400",
+  "https://picsum.photos/seed/class2/400/400",
+  "https://picsum.photos/seed/class3/400/400",
+  "https://picsum.photos/seed/class4/400/400",
+  "https://picsum.photos/seed/class5/400/400",
+  "https://picsum.photos/seed/class6/400/400",
 ]
 
 export function Gallery() {
@@ -56,11 +56,10 @@ export function Gallery() {
               className="relative aspect-square overflow-hidden rounded-lg cursor-pointer group"
               onClick={() => handleImageClick(imageUrl, index)}
             >
-              <Image
+              <img
                 src={imageUrl}
                 alt={`Gallery Image ${index + 1}`}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
             </div>
@@ -97,11 +96,9 @@ export function Gallery() {
               <ChevronRight className="w-8 h-8" />
             </button>
             
-            <Image
+            <img
               src={selectedImage}
               alt="Enlarged"
-              width={800}
-              height={600}
               className="rounded-lg max-h-[80vh] w-auto object-contain"
             />
           </div>

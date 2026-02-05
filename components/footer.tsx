@@ -1,6 +1,6 @@
 "use client"
 
-import Image from "next/image"
+/* eslint-disable @next/next/no-img-element */
 import { Rating } from "./rating"
 
 export function Footer() {
@@ -10,8 +10,8 @@ export function Footer() {
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
             <a href="#" className="flex items-center">
-              <Image
-                src="/LogoTKJ3.png"
+              <img
+                src="https://picsum.photos/seed/tkj3/72/72"
                 alt="Logo TKJ 3"
                 width={72}
                 height={72}
